@@ -1,0 +1,55 @@
+library(data.table)
+library(sqldf)
+sales <-fread("tSales.csv")
+products <-fread("tProducts.csv")
+pricelist <-fread("BibitorPriceList.csv")
+stores <-fread("tStores.csv")
+purchases <-fread("tPurchases.csv")
+vendors <-fread("tVendors.csv")
+invoices <-fread("tInvoices.csv")
+invoices$InvoiceDate <-as.character(invoices$InvoiceDate)
+invoices$PODate <-as.character(invoices$PODate)
+invoices$PayDate <-as.character(invoices$PayDate)
+purchases$ReceivingDate <-as.character(purchases$ReceivingDate)
+sales$SalesDate <-as.character(sales$SalesDate)
+
+sqldf("SELECT SUM(SalesQuantity *SalesPrice) AS TotalRevenue
+FROM sales
+LEFT JOIN products ON sales.Brand = products.Brand
+WHERE products.Description like '%Seagrams 7 Crown%'")
+
+sqldf("SELECT s.Store, st.City, 
+  SUM((s.SalesQuantity * s.SalesPrice) - (s.SalesQuantity * p.PurchasePrice)) AS GrossProfit
+FROM sales s
+  JOIN products p ON s.Brand = p.Brand
+  JOIN stores st ON s.Store = s.Store
+WHERE p.Description = 'Ole Smoky Pumpkin Pie'
+  AND s.Store BETWEEN 40 AND 49
+GROUP BY s.Store, s.City
+")
+
+sqldf("SELECT v.VendorNo, v.VendorName,
+IFNULL(SUM(p.PurchasePrice * p.Quantity), 0) AS PurchaseAmount,
+IFNULL(SUM(i.Amount), 0) AS InvoiceAmount
+FROM vendors v
+LEFT JOIN purchases p ON v.VendorNo = p.VendorNo
+LEFT JOIN invoices i ON v.VendorNo = i.VendorNumber
+GROUP BY v.VendorNo, v.VendorName
+
+
+sqldf("SELECT p.Brand, p.Description,
+SUM((s.SalesQuantity * s.SalesPrice) - (s.SalesQuantity * p.PurchasePrice)) AS GrossProfit
+FROM sales s
+JOIN products p ON s.Brand = p.Brand AND
+WHERE p.Classification = 'Wine'
+GROUP BY p.Brand, p.Description)
+
+sqldf("
+  SELECT p.Brand, p.Description,
+         SUM(s.SalesQuantity) AS BottlesSold
+  FROM sales s
+  JOIN products p ON s.Brand = p.Brand
+  GROUP BY p.Brand, p.Description
+  ORDER BY BottlesSold DESC
+  LIMIT 1
+")
