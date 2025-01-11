@@ -51,11 +51,3 @@ To run this script:
 2. Install and load the `data.table` and `sqldf` packages.
 3. Run the script in an R environment.
 
-## Note
-
-- Modify file paths if the CSV files are not in the working directory.
-- Ensure proper data types and formats in the CSV files for accurate results.
-
-Citations:
-[1] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/47283116/1ec176af-fa41-4ca5-8dca-5f2d44da7b62/Lance-Minor-Twitch-DataScience-CoverLetter.pdf
-[2] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/47283116/88a280e9-d7f3-409b-9ac4-1cad73d458ad/Lance-Minor-Twitch-DataScience-Resume.pdf
